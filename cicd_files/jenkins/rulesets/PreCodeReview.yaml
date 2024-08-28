@@ -1,0 +1,38 @@
+modelVersion: 2.0
+
+description: "Thunderbee: Rules for running pre code Review the Pooling Tooling Client tool"
+
+docker-images:
+  - python3: armdocker.rnd.ericsson.se/proj-eric-oss-dev-test/resource-pooling-tool-client_python_precode:latest
+  - scanner: armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/sonarsource/sonar-scanner-cli:5.0
+
+env:
+  - PWD
+  - WORKSPACE
+  - CHANGED_PYTHON_FILES
+  - SONARQUBE_TOKEN
+
+rules:
+  run-python-unit-tests:
+    - task: python-unit-tests
+      docker-image: python3
+      cmd: coverage run --source rptrc -m pytest -v
+    - task: python-coverage-xml
+      docker-image: python3
+      cmd: coverage xml -i
+    - task: python-coverage-report
+      docker-image: python3
+      cmd: coverage report
+
+  run-python-linting:
+    - task: run-pylint
+      docker-image: python3
+      cmd: pylint --persistent=no ${env.CHANGED_PYTHON_FILES}
+    - task: run-flake8
+      docker-image: python3
+      cmd: flake8 --exclude bob .
+
+  run-python-sonarqube-analysis:
+    - task: run-analysis
+      docker-image: scanner
+      cmd: -Dsonar.host.url=https://codeanalyzer2.internal.ericsson.com/ -Dsonar.projectKey=pooling-tooling-client -Dsonar.login=${env.SONARQUBE_TOKEN} -Dsonar.exclusions=**/*.groovy,**/tests/** -Dsonar.sources=./rptrc -Dsonar.python.coverage.reportPaths=./coverage.xml

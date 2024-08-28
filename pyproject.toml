@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "rptrc"
+version = "0.0.1"
+description = "A REST client that interacts with the RPT tool"
+authors = ["Thunderbee <PDLENMCOUN@pdl.internal.ericsson.com>"]
+
+[tool.poetry.dependencies]
+python = "3.9.4"
+requests = "2.30.0"
+paramiko = "2.10.3"
+click = "7.1.2"
+charset_normalizer = "3.2.0"
+colorlog = "6.7.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+coverage = "*"
+pylint = "*"
+flake8 = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+log_cli = false
+log_cli_level = "INFO"
+log_cli_format = "[%(levelname)s][%(filename)s:%(funcName)s:%(lineno)s][%(asctime)s] %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+norecursedirs = "bob"
+
+[tool.poetry.scripts]
+test = 'local_dev.script_executor:test_changed_files'
+test_all = 'local_dev.script_executor:test_all'
+test_unit = 'local_dev.script_executor:test_unit'
+lint = 'local_dev.script_executor:lint_changed_files'
+lint_all = 'local_dev.script_executor:lint_all'
